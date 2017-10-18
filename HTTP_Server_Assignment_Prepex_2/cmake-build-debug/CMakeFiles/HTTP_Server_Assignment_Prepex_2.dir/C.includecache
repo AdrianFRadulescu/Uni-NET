@@ -23,4 +23,12 @@ unistd.h
 -
 pthread/pthread.h
 -
+arpa/inet.h
+-
+signal.h
+-
+math.h
+-
+time.h
+-
 

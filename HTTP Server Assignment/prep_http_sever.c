@@ -4,9 +4,17 @@
 #include <arpa/inet.h> //inet_addr
 #include <unistd.h>    //write
 #include <pthread.h>
+#include <tclDecls.h>
 #include "stdlib.h"
 
-int create_socket (uint16_t port) {
+char web_page[] =
+"HTTP/1.1 200 OK\r\n"
+"Content-Type: text/html charset=UTF-8\r\n\r\n"
+"<!DOCTYPE html>\r\n"
+"<html><head><title></title></html>"
+"";
+/*
+int make_socket (uint16_t port) {
     int socket_desc;
     struct sockaddr_in name;
 
@@ -28,33 +36,30 @@ int create_socket (uint16_t port) {
     }
     return socket_desc;
 }
+*/
 
+int main(int argc , char *argv[]) {
 
-int main(int argc, char *argv[]) {
-
-    char * end;
-    int socket_desc = create_socket((uint16_t) strtol(argv[1], &end, 10));
-
+    char* end;
+    //int socket_desc = make_socket((uint16_t) strtol(argv[1], &end, 10));
+    /*
     if (listen(socket_desc, 0) < 0){
         perror("listen");
         exit(EXIT_FAILURE);
-    }
+    }*/
 
-     puts("Waiting for incoming connections");
+    // puts("Waiting for incoming connections");
 
-    int c = sizeof(struct sockaddr_in);
+    /*int c = sizeof(struct sockaddr_int);
     struct sockaddr_in client;
     int new_socket = accept(socket_desc, (struct sockaddr*) &client, (socklen_t*) &c);
 
     if (new_socket < 0){
         puts("connection failed");
-    }
+    }*/
 
-    puts("Connection accepted");
+    //puts("Connection accepted");
 
-    shutdown(new_socket, 2);
-    shutdown(socket_desc, 2);
-
-
+    //shutdown(socket_desc, 2);
     return 0;
 }

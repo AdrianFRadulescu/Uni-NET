@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/adrian_radulescu1997/Documents/Uni-Courses/III/NET/Uni-NET/HTTP Server Assignment/prep_http_sever.c
+stdio.h
+-
+string.h
+-
+sys/socket.h
+-
+arpa/inet.h
+-
+unistd.h
+-
+pthread.h
+-
+tclDecls.h
+-
+stdlib.h
+/Users/adrian_radulescu1997/Documents/Uni-Courses/III/NET/Uni-NET/HTTP Server Assignment/stdlib.h
+

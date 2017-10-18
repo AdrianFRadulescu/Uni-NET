@@ -1,0 +1,4 @@
+/Applications/CLion.app/Contents/bin/cmake/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" "/Users/adrian_radulescu1997/Documents/Uni-Courses/III/NET/Uni-NET/HTTP Server Assignment"
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /Users/adrian_radulescu1997/Documents/Uni-Courses/III/NET/Uni-NET/HTTP Server Assignment/cmake-build-debug
