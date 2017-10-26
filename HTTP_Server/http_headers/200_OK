@@ -1,0 +1,8 @@
+HTTP/1.1 200 OK
+Server: bla bla
+Last-Modified: Tue, 01 May 2007 14:24:39 GMT
+ETag: 499fd34e-29ec-42f695ca96761;48fe7523cfcc1
+Accept-Ranges: bytes
+Content-Type: text/html
+
+
