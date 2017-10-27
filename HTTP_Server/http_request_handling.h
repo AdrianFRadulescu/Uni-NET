@@ -45,6 +45,8 @@ void tear_down_request(http_request_t*);
 
 char* string_strtok_r(char*, char*, char**);
 
+char* str_replace(char**, char*, char*);
+
 /**
  * Parse a given buffer and return a http_request_t out of it
  * @param buffer
@@ -62,4 +64,3 @@ char* load_file_content(char[]);
 
 char* load_header(char[]);
 
-char *str_replace(char *, char*, char*);

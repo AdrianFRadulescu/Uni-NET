@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <zconf.h>
 
 #include "http_request_handling.h"
 
@@ -29,6 +30,9 @@ void tear_down_request(http_request_t* request){
     free(request ->request_headers);
 }
 
+/* Custom version of strtok
+*/
+
 char* string_strtok_r(char* str_, char* sep_, char** save_) {
 
     if (*save_ != NULL) {
@@ -36,7 +40,7 @@ char* string_strtok_r(char* str_, char* sep_, char** save_) {
     }
 
     char* sep_pos_ = strstr(str_, sep_);
-
+    fprintf(stderr, "here2\n");
     *save_ = sep_pos_ + strlen(sep_);
     if (sep_pos_)
         memset(sep_pos_, 0, strlen(sep_));
@@ -44,10 +48,63 @@ char* string_strtok_r(char* str_, char* sep_, char** save_) {
     return str_;
 }
 
+
+/**
+ * Repla
+ * @param orig
+ * @param rep_
+ * @param with
+ * @return
+ */
+
+char* str_replace(char** orig_, char* rep_, char* with_) {
+
+    char* result_ = realloc(NULL, 0); // the return string
+    char* rest_ = *orig_;
+    char* prev_rest_ = rest_;
+    char* tmp_;
+    int result_len = 0;
+
+    while ((rest_ = strstr(rest_, rep_))) {
+        *rest_ = '\0';
+
+        tmp_ = realloc(result_, sizeof(char) * strlen(prev_rest_) + sizeof(char) * strlen(with_));
+
+        while (!(tmp_ = realloc(result_, sizeof(char) * strlen(prev_rest_)))) {
+            sleep(10);
+        }
+
+        result_ = tmp_;
+        strncpy(result_ + result_len, prev_rest_, strlen(prev_rest_));
+        strncpy(result_ + result_len + strlen(prev_rest_), with_, strlen(with_));
+        result_len += strlen(prev_rest_) + strlen(with_);
+        *rest_ = *rep_;
+        rest_ += strlen(rep_);
+        prev_rest_ = rest_;
+    }
+
+    //reached last substring of the orignal string
+    if (prev_rest_ && strlen(prev_rest_) != 0) {
+        while (! (tmp_ = realloc(result_, sizeof(char) * strlen(prev_rest_)))) {
+            sleep(10);
+        }
+
+        result_ = tmp_;
+        strncpy(result_ + result_len, prev_rest_, strlen(prev_rest_));
+        result_len += strlen(prev_rest_);
+    }
+
+    //free(*orig_);
+    return result_;
+}
+
+/*
+*/
+
 void get_http_request(char* buffer, http_request_t* request, int* ok){
 
-    char* token;
-    char* sub_token;
+    //char* token;
+    //char* sub_token;
     char crlf_sep_[] = "\r\n";
     char space_sep_[] = " ";
     char* save_ = NULL;
@@ -57,12 +114,12 @@ void get_http_request(char* buffer, http_request_t* request, int* ok){
     char* aux;
 
     // get the request line
-
-    if ((aux = strtok_r(buffer, crlf_sep_, &save_)) == NULL){
+    fprintf(stderr, "processing http reqest\n");
+    if ((aux = string_strtok_r(buffer, crlf_sep_, &save_)) == NULL){
         *ok = 0;
         return;
     }
-
+    fprintf(stderr, "here1\n");
     strncpy(line, aux, strlen(aux));
 
     // METHOD
@@ -94,10 +151,11 @@ char* load_file_content(char file_path[]){
     long file_size = ftell(file_desc_);
     fseek(file_desc_, 0, SEEK_SET);
 
-    char *file_content = malloc(sizeof(char) * (size_t) file_size + 1);
-    fread(file_content, (size_t) file_size, 1, file_desc_);
-    file_content[file_size+1] = '\0';
-    return file_content;
+    char *file_content_ = malloc(sizeof(char) * (size_t) file_size + 1);
+    fread(file_content_, (size_t) file_size, 1, file_desc_);
+    file_content_[file_size+1] = '\0';
+    fprintf(stderr, "load_file %p\n", file_content_);
+    return file_content_;
 }
 
 /**
@@ -108,71 +166,14 @@ char* load_file_content(char file_path[]){
 
 char* load_header(char header_file_path[]){
 
-    char* msg = load_file_content(header_file_path);
+    char* header_ = load_file_content(header_file_path);
 
-    char* header = str_replace(msg, "\n", "\r\n");
-    strcat(header, "\r\n");
-    return header;
+    header_ = str_replace(&header_, "\n", "\r\n");
+    fprintf(stderr, "load_header %p\n", header_);
+    header_ = strcat(header_, "\r\n");
+    fprintf(stderr, "load_header %p\n", header_);
+    return header_;
 }
 
-/**
- * Repla
- * @param orig
- * @param rep_
- * @param with
- * @return
- */
 
-char *str_replace(char *orig_, char *rep_, char *with_) {
-
-    char *result; // the return string
-    char *ins;    // the next insert point
-    char *tmp;    // varies
-    size_t len_rep;  // length of rep (the string to remove)
-    size_t len_with; // length of with (the string to replace rep with)
-    size_t len_front; // distance between rep and end of last rep
-    int count;    // number of replacements
-
-    // sanity checks and initialization
-    if (!orig_ || !rep_)
-        return NULL;
-
-    len_rep = strlen(rep_);
-
-    if (len_rep == 0)
-        return NULL; // empty rep causes infinite loop during count
-
-    if (!with_)
-        with_ = "";
-
-    len_with = strlen(with_);
-
-    // count the number of replacements needed
-    ins = orig_;
-    for (count = 0; tmp = strstr(ins, rep_); count ++) {
-        ins = tmp + len_rep;
-    }
-
-    tmp = result = malloc(strlen(orig_) + (len_with - len_rep) * count + 1);
-
-    if (!result)
-        return NULL;
-
-    // first time through the loop, all the variable are set correctly
-    // from here on,
-    //    tmp points to the end of the result string
-    //    ins points to the next occurrence of rep in orig
-    //    orig points to the remainder of orig after "end of rep"
-    while (count--) {
-
-        ins = strstr(orig_, rep_);
-        len_front = ins - orig_;
-        tmp = strncpy(tmp, orig_, len_front) + len_front;
-        tmp = strcpy(tmp, with_) + len_with;
-        orig_ += len_front + len_rep; // move to next "end of rep"
-    }
-
-    strcpy(tmp, orig_);
-    return result;
-}
 
