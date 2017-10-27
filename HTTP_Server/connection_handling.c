@@ -70,9 +70,8 @@ static void handle_client_request(const int client_desc, const char* client_info
         return;
     }
 
-    char* msg_header_content_ = load_header("/Users/adrian_radulescu1997/Documents/Uni-Courses/III/NET/Uni-NET/HTTP_Server/http_headers/400_bad_request");
+    char* msg_header_ = load_header("/Users/adrian_radulescu1997/Documents/Uni-Courses/III/NET/Uni-NET/HTTP_Server/http_headers/400_bad_request");
 
-    char* msg_header_ = str_replace(msg_header_content_, "\n", "\r\n");
     msg_header_ = strcat(msg_header_, "\r\n");
 
     char*  msg_content_ = load_file_content("/Users/adrian_radulescu1997/Documents/Uni-Courses/III/NET/Uni-NET/HTTP_Server/html_pages/erorr_page.html");
@@ -84,7 +83,6 @@ static void handle_client_request(const int client_desc, const char* client_info
     tear_down_request(&client_request);
     free(msg_header_);
     free(msg_content_);
-    free(msg_header_content_);
 }
 
 
