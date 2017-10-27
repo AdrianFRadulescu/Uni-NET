@@ -34,8 +34,8 @@ char* create_printable_address(const struct sockaddr_in6 *const address,
     } else {
 
         perror("Could not parse the address.");
-        char msg[] = "Address cannot be parsed";
-        strncmp(buffer,msg, sizeof(msg));
+        //char msg[] = "Address cannot be parsed";
+        //strncmp(buffer,msg, sizeof(msg));
     }
 
     return buffer;
