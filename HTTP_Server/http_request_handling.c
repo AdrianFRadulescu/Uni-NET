@@ -68,11 +68,9 @@ char* str_replace(char** orig_, char* rep_, char* with_) {
     while ((rest_ = strstr(rest_, rep_))) {
         *rest_ = '\0';
 
-        tmp_ = realloc(result_, sizeof(char) * strlen(prev_rest_) + sizeof(char) * strlen(with_));
 
-        while (!(tmp_ = realloc(result_, sizeof(char) * strlen(prev_rest_)))) {
-            sleep(10);
-        }
+
+        while (!(tmp_ = realloc(result_, result_len + sizeof(char) * strlen(prev_rest_))));
 
         result_ = tmp_;
         strncpy(result_ + result_len, prev_rest_, strlen(prev_rest_));
@@ -85,13 +83,10 @@ char* str_replace(char** orig_, char* rep_, char* with_) {
 
     //reached last substring of the orignal string
     if (prev_rest_ && strlen(prev_rest_) != 0) {
-        while (! (tmp_ = realloc(result_, sizeof(char) * strlen(prev_rest_)))) {
-            sleep(10);
-        }
+        while (! (tmp_ = realloc(result_, result_len + sizeof(char) * strlen(prev_rest_))));
 
         result_ = tmp_;
         strncpy(result_ + result_len, prev_rest_, strlen(prev_rest_));
-        result_len += strlen(prev_rest_);
     }
 
     //free(*orig_);
@@ -154,7 +149,7 @@ char* load_file_content(char file_path[]){
     char *file_content_ = malloc(sizeof(char) * (size_t) file_size + 1);
     fread(file_content_, (size_t) file_size, 1, file_desc_);
     file_content_[file_size+1] = '\0';
-    fprintf(stderr, "load_file %p\n", file_content_);
+    fprintf(stderr, "load_file %p\n", (void*) file_content_);
     return file_content_;
 }
 
@@ -169,9 +164,9 @@ char* load_header(char header_file_path[]){
     char* header_ = load_file_content(header_file_path);
 
     header_ = str_replace(&header_, "\n", "\r\n");
-    fprintf(stderr, "load_header %p\n", header_);
+    fprintf(stderr, "load_header %p\n", (void*) header_);
     header_ = strcat(header_, "\r\n");
-    fprintf(stderr, "load_header %p\n", header_);
+    fprintf(stderr, "load_header %p\n", (void*) header_);
     return header_;
 }
 

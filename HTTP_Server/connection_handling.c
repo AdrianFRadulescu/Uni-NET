@@ -100,7 +100,7 @@ void* thread_process(void* th_data_){
 
     thread_control_block_t *tcb_ = (thread_control_block_t*) th_data_;
     char buffer[INET6_ADDRSTRLEN];
-    char* printable_addr;
+    //char* printable_addr;
 
    // printable_addr = create_printable_address(&(tcb_->client_addr),  buffer, sizeof(buffer));
 
