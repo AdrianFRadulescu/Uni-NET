@@ -1,10 +1,18 @@
 //
 // Created by Radulescu Adrian on 18/10/2017.
 //
-
 #include "connection_handling.h"
 
-#define BUFFER_LENGTH 256
+#define BUFFER_LENGTH (8*1024)
+
+
+void pwd_adjust(const char* str_, char pwd[]){
+
+    realpath(str_, pwd);
+    char* it_ = pwd + strlen(pwd);
+    while (*(--it_) != '/');
+    *(it_+1) = '\0';
+}
 
 /**
  * Puts given address in human readable format
@@ -30,6 +38,7 @@ char* create_printable_address(const struct sockaddr_in6 *const address,
         char msg[] = "Client with address ";
         strncpy(buffer, msg, strlen(msg));
         strncpy(buffer + strlen(msg), printable, strlen(printable));
+        fprintf(stderr, "%s\n", buffer);
 
     } else {
 
@@ -58,6 +67,8 @@ static void handle_client_request(const int client_desc, const char* client_info
     read(client_desc, buffer, BUFFER_LENGTH);
     // send(client_desc, client_info, strlen(client_info) * sizeof(char),0);
 
+    fprintf(stderr, "RECEIVEDL:\n%s", buffer);
+
     http_request_t client_request;
     int success = 1;
     init_request(&client_request);
@@ -70,20 +81,48 @@ static void handle_client_request(const int client_desc, const char* client_info
         return;
     }
 
-    char* msg_header_ = load_header("/Users/adrian_radulescu1997/Documents/Uni-Courses/III/NET/Uni-NET/HTTP_Server/http_headers/400_bad_request");
+    fprintf(stderr, "RECEIVED:\n\n");
+    fprintf(stderr, "%c\n", *client_request.request_line.request_method);
+    fprintf(stderr, "%d\n", strncmp("GET", client_request.request_line.request_method, 3));
+    fprintf(stderr, "%s\n", client_request.request_line.request_method);
 
+
+    fprintf(stderr, "%s\n", client_request.request_line.request_http_version);
+    fprintf(stderr, "%s\n", client_request.request_line.request_URI);
+
+    //char* msg_response_line_ = load_response_line(strcat(pwd, ));
+
+    /*
+    char* msg_header_ = load_header("/Users/adrian_radulescu1997/Documents/Uni-Courses/III/NET/Uni-NET/HTTP_Server/http_headers/", &resource_mutex);
+    //msg_header_ = strcat(msg_header_, );
+
+
+    char*  msg_content_ = load_file_content("/Users/adrian_radulescu1997/Documents/Uni-Courses/III/NET/Uni-NET/HTTP_Server/html_pages/erorr_page.html", &resource_mutex);
+
+    // attach content length
+    size_t message_content_length = sizeof(char) *  + strlen(msg_content_);
+
+    char* content_header_annex_ = malloc(sizeof(char)*256);
+
+    sprintf(content_header_annex_, "Content-Length: %zu\r\n", message_content_length);
+
+    content_header_annex_ = realloc(content_header_annex_, sizeof(char) * strlen(content_header_annex_));
+
+    msg_header_ = strcat(msg_header_, content_header_annex_);
     msg_header_ = strcat(msg_header_, "\r\n");
 
-    char*  msg_content_ = load_file_content("/Users/adrian_radulescu1997/Documents/Uni-Courses/III/NET/Uni-NET/HTTP_Server/html_pages/erorr_page.html");
 
     send(client_desc, msg_header_, sizeof(char) * strlen(msg_header_), 0);
     send(client_desc, msg_content_, sizeof(char) * strlen(msg_content_), 0);
     // free the dynamically allocated headers
 
+    fprintf(stderr,"SENDING:\n %s%s",msg_header_, msg_content_);
+
     tear_down_request(&client_request);
     free(msg_header_);
     free(msg_content_);
-}
+    */
+ }
 
 
 void cleanup_thread(void* th_data){
@@ -100,9 +139,9 @@ void* thread_process(void* th_data_){
 
     thread_control_block_t *tcb_ = (thread_control_block_t*) th_data_;
     char buffer[INET6_ADDRSTRLEN];
-    //char* printable_addr;
+    char* printable_addr;
 
-   // printable_addr = create_printable_address(&(tcb_->client_addr),  buffer, sizeof(buffer));
+    printable_addr = create_printable_address(&(tcb_->client_addr),  buffer, sizeof(buffer));
 
     handle_client_request(tcb_ ->client_desc, buffer);
 

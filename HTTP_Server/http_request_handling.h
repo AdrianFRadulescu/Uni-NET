@@ -5,7 +5,18 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <memory.h>
+#include <pthread.h>
+
+
+#define CONTENT_LENGTH_HD "Content-Length: "
+#define CONTENT_TYPE_HD "Content-Type: text/html; charset=UTF-8"
+#define AGE_HD "Age: "
+#define ACCEPT_ENCODING_HD "Accept-Encoding: "
+/*
+#define
+#define
+#define
+*/
 
 #ifndef HTTP_BASIC_SERVER_HTTP_REQUEST_HANDLING_H
 #define HTTP_BASIC_SERVER_HTTP_REQUEST_HANDLING_H
@@ -60,7 +71,8 @@ void get_http_request(char*, http_request_t*, int*);
  * @return
  */
 
-char* load_file_content(char[]);
+char* load_file_content(char[], pthread_mutex_t*);
 
-char* load_header(char[]);
+char* load_response_line(char[], pthread_mutex_t*);
 
+void create_header(char[], char[], char[]);

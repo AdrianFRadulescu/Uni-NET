@@ -4,7 +4,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <zconf.h>
 
 #include "http_request_handling.h"
 
@@ -13,7 +12,7 @@
  * @param request
  */
 
-void init_request(http_request_t* request){
+void init_request(http_request_t* request) {
 
     request ->request_header_count = 0;
     request ->request_header_available = 3;
@@ -42,8 +41,8 @@ char* string_strtok_r(char* str_, char* sep_, char** save_) {
     char* sep_pos_ = strstr(str_, sep_);
     fprintf(stderr, "here2\n");
     *save_ = sep_pos_ + strlen(sep_);
-    if (sep_pos_)
-        memset(sep_pos_, 0, strlen(sep_));
+    //if (sep_pos_)
+      //  memset(sep_pos_, 0, strlen(sep_));
 
     return str_;
 }
@@ -68,9 +67,7 @@ char* str_replace(char** orig_, char* rep_, char* with_) {
     while ((rest_ = strstr(rest_, rep_))) {
         *rest_ = '\0';
 
-
-
-        while (!(tmp_ = realloc(result_, result_len + sizeof(char) * strlen(prev_rest_))));
+        while (!(tmp_ = realloc(result_, result_len + sizeof(char) * strlen(prev_rest_) + sizeof(char) * strlen(with_))));
 
         result_ = tmp_;
         strncpy(result_ + result_len, prev_rest_, strlen(prev_rest_));
@@ -89,14 +86,14 @@ char* str_replace(char** orig_, char* rep_, char* with_) {
         strncpy(result_ + result_len, prev_rest_, strlen(prev_rest_));
     }
 
-    //free(*orig_);
+    free(*orig_);
     return result_;
 }
 
 /*
 */
 
-void get_http_request(char* buffer, http_request_t* request, int* ok){
+void get_http_request(char* buffer, http_request_t* request, int* ok) {
 
     //char* token;
     //char* sub_token;
@@ -135,19 +132,21 @@ void get_http_request(char* buffer, http_request_t* request, int* ok){
 
 /**
  * Loads the content of the file given by the file path
- * @param file_path
+ * @param file_path_
  * @return
  */
 
-char* load_file_content(char file_path[]){
+char* load_file_content(char file_path_[], pthread_mutex_t* mutex_) {
 
-    FILE* file_desc_ = fopen(file_path, "r");
+    pthread_mutex_lock(mutex_);
+    FILE* file_desc_ = fopen(file_path_, "r");
     fseek(file_desc_, 0, SEEK_END);
     long file_size = ftell(file_desc_);
     fseek(file_desc_, 0, SEEK_SET);
 
     char *file_content_ = malloc(sizeof(char) * (size_t) file_size + 1);
     fread(file_content_, (size_t) file_size, 1, file_desc_);
+    pthread_mutex_unlock(mutex_);
     file_content_[file_size+1] = '\0';
     fprintf(stderr, "load_file %p\n", (void*) file_content_);
     return file_content_;
@@ -159,16 +158,14 @@ char* load_file_content(char file_path[]){
  * @return
  */
 
-char* load_header(char header_file_path[]){
-
-    char* header_ = load_file_content(header_file_path);
-
-    header_ = str_replace(&header_, "\n", "\r\n");
-    fprintf(stderr, "load_header %p\n", (void*) header_);
-    header_ = strcat(header_, "\r\n");
-    fprintf(stderr, "load_header %p\n", (void*) header_);
-    return header_;
+void create_header(char header_[], char header_type_[], char header_value_[]) {
+    strncpy(header_, header_type_, strlen(header_type_));
+    strncpy(header_ + strlen(header_type_), header_value_, strlen(header_value_));
+    strncpy(header_ + strlen(header_type_) + strlen(header_value_), "\r\n", strlen("\r\n"));
 }
 
+char* load_response_line(char file_path_[], pthread_mutex_t* mutex_) {
+    return strcat(load_file_content(file_path_, mutex_), "\r\n");
+}
 
 

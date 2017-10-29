@@ -19,10 +19,15 @@
 
 #include "http_request_handling.h"
 
+#define PATH_LENGTH 512
+
 #ifndef HTTP_BASIC_SERVER_CONNECTION_HANDLING_H
 #define HTTP_BASIC_SERVER_CONNECTION_HANDLING_H
-
 #endif //HTTP_BASIC_SERVER_CONNECTION_HANDLING_H
+
+
+pthread_mutex_t resource_mutex;
+char pwd[PATH_LENGTH];
 
 typedef struct thread_control_block{
     int client_desc;
@@ -30,7 +35,7 @@ typedef struct thread_control_block{
     socklen_t client_addr_size;
 } thread_control_block_t;
 
-
+void pwd_adjust(const char*, char[]);
 
 void* thread_process(void*);
 

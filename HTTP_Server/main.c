@@ -1,25 +1,17 @@
 #include <stdio.h>
-#include <evdns.h>
 #include <stdlib.h>
 #include <math.h>
+
 
 #include "listening_socket.h"
 #include "connection_handling.h"
 
+
 int main(const int argc, const char* argv[]) {
 
-    char* msg_ = malloc(sizeof(char) * strlen("sadadsdasd\r\n1sadadsdasd\r\n2sadadsdasd\r\n3sadadsdasd\r\n4sadadsdasd\r\n5sadadsdasd\r\n"));
+    // adjust path of the application
+    pwd_adjust(argv[0], pwd);
 
-    strcpy(msg_, "sadadsdasd\r\n1sadadsdasd\r\n2sadadsdasd\r\n3sadadsdasd\r\n4sadadsdasd\r\n5sadadsdasd");
-    fprintf(stderr, "%s", msg_);
-
-    char sep_[] = "\r\n";
-
-    str_replace(&msg_, "\r\n","123");
-
-    fprintf(stderr, "%s", msg_);
-
-    /*
     // get port
 
     char* end_;
@@ -42,7 +34,7 @@ int main(const int argc, const char* argv[]) {
     while (create_client_thread(server_socket_desc) >= 0);
 
     shutdown(server_socket_desc, 2);
-    */
+    //*/
     return 0;
 }
 
