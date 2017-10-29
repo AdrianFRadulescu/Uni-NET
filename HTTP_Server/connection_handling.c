@@ -50,7 +50,9 @@ char* create_printable_address(const struct sockaddr_in6 *const address,
     return buffer;
 }
 
+void server_error(){
 
+}
 
 
 /**
@@ -78,14 +80,17 @@ static void handle_client_request(const int client_desc, const char* client_info
 
     if (!success){
         perror("error on parsing http request");
+        server_error();
         return;
     }
 
+
     fprintf(stderr, "RECEIVED:\n\n");
-    fprintf(stderr, "%c\n", *client_request.request_line.request_method);
+
+    fprintf(stderr, "-->%p", &client_request.request_line);
+
     fprintf(stderr, "%d\n", strncmp("GET", client_request.request_line.request_method, 3));
     fprintf(stderr, "%s\n", client_request.request_line.request_method);
-
 
     fprintf(stderr, "%s\n", client_request.request_line.request_http_version);
     fprintf(stderr, "%s\n", client_request.request_line.request_URI);
@@ -118,11 +123,12 @@ static void handle_client_request(const int client_desc, const char* client_info
 
     fprintf(stderr,"SENDING:\n %s%s",msg_header_, msg_content_);
 
-    tear_down_request(&client_request);
     free(msg_header_);
     free(msg_content_);
     */
- }
+
+    tear_down_request(&client_request);
+}
 
 
 void cleanup_thread(void* th_data){

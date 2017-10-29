@@ -27,6 +27,9 @@ void init_request(http_request_t* request) {
 void tear_down_request(http_request_t* request){
 
     free(request ->request_headers);
+    free(request ->request_line.request_method);
+    free(request ->request_line.request_URI);
+    free(request ->request_line.request_http_version);
 }
 
 /* Custom version of strtok
@@ -41,8 +44,8 @@ char* string_strtok_r(char* str_, char* sep_, char** save_) {
     char* sep_pos_ = strstr(str_, sep_);
     fprintf(stderr, "here2\n");
     *save_ = sep_pos_ + strlen(sep_);
-    //if (sep_pos_)
-      //  memset(sep_pos_, 0, strlen(sep_));
+    if (sep_pos_)
+        memset(sep_pos_, 0, strlen(sep_));
 
     return str_;
 }
@@ -105,26 +108,31 @@ void get_http_request(char* buffer, http_request_t* request, int* ok) {
 
     char* aux;
 
+
     // get the request line
     fprintf(stderr, "processing http reqest\n");
     if ((aux = string_strtok_r(buffer, crlf_sep_, &save_)) == NULL){
         *ok = 0;
         return;
     }
-    fprintf(stderr, "here1\n");
     strncpy(line, aux, strlen(aux));
 
     // METHOD
-    request ->request_line.request_method = string_strtok_r(line, space_sep_, &sub_save);
+    aux = string_strtok_r(line, space_sep_, &sub_save);
+    request ->request_line.request_method = malloc(sizeof(char) * strlen(aux));
+    strncpy(request ->request_line.request_method, aux, strlen(aux));
+
     // URI
-    request ->request_line.request_URI = string_strtok_r(NULL, space_sep_, &sub_save);
+    aux = string_strtok_r(line, space_sep_, &sub_save);
+    request ->request_line.request_URI = malloc(sizeof(char) * strlen(aux));
+    strncpy(request ->request_line.request_URI, aux, strlen(aux));
+
     //HTTP version
-    request ->request_line.request_http_version = string_strtok_r(NULL, space_sep_, &sub_save);
+    aux = string_strtok_r(line, space_sep_, &sub_save);
+    request ->request_line.request_http_version = malloc(sizeof(char) * strlen(aux));
+    strncpy(request ->request_line.request_http_version, aux, strlen(aux));
 
     // get the request headers
-
-
-
 
     // get message body
 }
