@@ -1,4 +1,3 @@
-//
 // Created by Radulescu Adrian on 18/10/2017.
 //
 #include "connection_handling.h"
@@ -108,29 +107,14 @@ static void handle_client_request(const int client_desc, const char* client_info
     init_response(&server_response);
     create_response(client_request, &server_response);
 
+    char* response_as_string_ = adjust_response(server_response);
 
+    fprintf(stderr, "stat_code2 = %s\n", server_response.status_code_);
 
-    //char* msg_response_line_ = load_response_line(strcat(pwd, ));
+    send(client_desc, response_as_string_, sizeof(char) * strlen(response_as_string_), 0);
 
     /*
-    char* msg_header_ = load_header("/Users/adrian_radulescu1997/Documents/Uni-Courses/III/NET/Uni-NET/HTTP_Server/http_headers/", &resource_mutex);
-    //msg_header_ = strcat(msg_header_, );
-
-
-    char*  msg_content_ = load_file_content("/Users/adrian_radulescu1997/Documents/Uni-Courses/III/NET/Uni-NET/HTTP_Server/html_pages/erorr_page.html", &resource_mutex);
-
-    // attach content length
-    size_t message_content_length = sizeof(char) *  + strlen(msg_content_);
-
-    char* content_header_annex_ = malloc(sizeof(char)*256);
-
-    sprintf(content_header_annex_, "Content-Length: %zu\r\n", message_content_length);
-
-    content_header_annex_ = realloc(content_header_annex_, sizeof(char) * strlen(content_header_annex_));
-
-    msg_header_ = strcat(msg_header_, content_header_annex_);
-    msg_header_ = strcat(msg_header_, "\r\n");
-
+    char* msg_header_ = load_header
 
     send(client_desc, msg_header_, sizeof(char) * strlen(msg_header_), 0);
     send(client_desc, msg_content_, sizeof(char) * strlen(msg_content_), 0);
@@ -142,13 +126,9 @@ static void handle_client_request(const int client_desc, const char* client_info
     free(msg_content_);
     */
 
+    free(response_as_string_);
     tear_down_request(&client_request);
     tear_down_response(&server_response);
-}
-
-
-void cleanup_thread(void* th_data) {
-
 }
 
 /**

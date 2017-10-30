@@ -16,7 +16,7 @@
 #define STATUS_CODE_206_PARTIAL_CONTENT                     "HTTP/1.1 206 Partial Content"
 #define STATUS_CODE_302_FOUND                               "HTTP/1.1 302 Found"
 #define STATUS_CODE_400_BAD_REQUEST                         "HTTP/1.1 400 Bad Request"
-#define STATUS_CODE_403_BAD_REQUEST                         "HTTP/1.1 403 Forbidden"
+#define STATUS_CODE_403_FORBIDDEN                         "HTTP/1.1 403 Forbidden"
 #define STATUS_CODE_404_NOT_FOUND                           "HTTP/1.1 404 Not Found"
 #define STATUT_CODE_416_REQUESTED_RANGE_NOT_SATISFIABLE     "HTTP/1.1 416 Range Not Satisfiable"
 
@@ -39,6 +39,9 @@
 #define CONTENT_TYPE_VALUE_MULTIRANGES                      "multipart/byteranges; boundary=3d6b6a416f9b5"
 #define CONNECTION_VALUE                                    "close"
 
+// OTHER CONSTANTS
+
+#define CRLF "\r\n"
 
 #ifndef HTTP_SERVER_HTTP_RESPONSE_HANDLING_H
 #define HTTP_SERVER_HTTP_RESPONSE_HANDLING_H

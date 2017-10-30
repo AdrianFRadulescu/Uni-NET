@@ -120,7 +120,7 @@ void get_http_request(char* buffer, http_request_t* request, int* ok) {
 
 
     // get the request line
-    fprintf(stderr, "processing http reqest\n");
+    fprintf(stderr, "processing http request\n");
     if ((aux = string_strtok_r(buffer, crlf_sep_, &save_)) == NULL){
         *ok = 0;
         return;

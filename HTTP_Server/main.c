@@ -9,11 +9,9 @@
 
 int main(const int argc, const char* argv[]) {
 
-    // adjust path of the application
-    pwd_adjust(argv[0], pwd);
 
     //deflate_file("html_pages/error_400_bad_request.html", "./tmp/aux1112.z");
-
+    ///Users/adrian_radulescu1997/Documents/Uni-Courses/III/NET/Uni-NET/HTTP_Server/html_pages/index.html
     // adjust html resources
 
     html_resource_t html_resource1_[] = {
@@ -40,9 +38,12 @@ int main(const int argc, const char* argv[]) {
     uint16_t port;
 
      if (argc == 2) {
-        port = (uint16_t) strtol(argv[1], &end_, 10);
+         port = (uint16_t) strtol(argv[1], &end_, 10);
+         // adjust path of the application
+         pwd_adjust(argv[0], pwd);
     } else {
-        port = 3349;
+         port = 3349;
+         strcpy(pwd, "/Users/adrian_radulescu1997/Documents/Uni-Courses/III/NET/Uni-NET/HTTP_Server/");
     }
 
     if (1024 >= port || port > pow(2,31)) {
