@@ -50,10 +50,6 @@ char* create_printable_address(const struct sockaddr_in6 *const address,
     return buffer;
 }
 
-void server_error(){
-
-}
-
 
 /**
  * Reads and parses a request from a client and then sends the appropriate response
@@ -61,39 +57,56 @@ void server_error(){
  * @param client_info contains the
  */
 
-static void handle_client_request(const int client_desc, const char* client_info){
+static void handle_client_request(const int client_desc, const char* client_info) {
 
-    char buffer[BUFFER_LENGTH];
+    char buffer_[BUFFER_LENGTH];
+    http_request_t client_request;
+    http_response_t server_response;
+    int success = 1;
+
+    // get the request
 
     // read request from client
-    read(client_desc, buffer, BUFFER_LENGTH);
+    read(client_desc, buffer_, BUFFER_LENGTH);
     // send(client_desc, client_info, strlen(client_info) * sizeof(char),0);
+    fprintf(stderr, "RECEIVED:\n %s\n", buffer_);
 
-    fprintf(stderr, "RECEIVEDL:\n%s", buffer);
-
-    http_request_t client_request;
-    int success = 1;
     init_request(&client_request);
 
-    // parse the buffer to get the http request
-    get_http_request(buffer, &client_request, &success);
+    // parse the buffer_ to get the http request
+    get_http_request(buffer_, &client_request, &success);
 
     if (!success){
         perror("error on parsing http request");
-        server_error();
+
+        // return error directly
+        tear_down_request(&client_request);
+
+        char bad_request_response_[] = STATUS_CODE_400_BAD_REQUEST;
+        strcat(bad_request_response_, "\r\n");
+        strcat(bad_request_response_, CONTENT_LENGTH_RESP_HD);
+        strcat(bad_request_response_, "\r\n");
+        strcat(bad_request_response_, CONTENT_TYPE_RESP_HD);
+        strcat(bad_request_response_, "\r\n");
+        strcat(bad_request_response_, CONNECTION_RESP_HD);
+        strcat(bad_request_response_, "\r\n\r\n");
+
+        // load 400 page
+        char* message_body = load_file_content(strcat(pwd, "html_pages/error_400_bad_request.html"), &resource_mutex);
+
+        strcat(bad_request_response_, message_body);
+        free(message_body);
+
+        send(client_desc, bad_request_response_, strlen(bad_request_response_), 0);
+
         return;
     }
 
+    // create the appropriate request for the client
+    init_response(&server_response);
+    create_response(client_request, &server_response);
 
-    fprintf(stderr, "RECEIVED:\n\n");
 
-    fprintf(stderr, "-->%p", &client_request.request_line);
-
-    fprintf(stderr, "%d\n", strncmp("GET", client_request.request_line.request_method, 3));
-    fprintf(stderr, "%s\n", client_request.request_line.request_method);
-
-    fprintf(stderr, "%s\n", client_request.request_line.request_http_version);
-    fprintf(stderr, "%s\n", client_request.request_line.request_URI);
 
     //char* msg_response_line_ = load_response_line(strcat(pwd, ));
 
@@ -128,10 +141,11 @@ static void handle_client_request(const int client_desc, const char* client_info
     */
 
     tear_down_request(&client_request);
+    tear_down_response(&server_response);
 }
 
 
-void cleanup_thread(void* th_data){
+void cleanup_thread(void* th_data) {
 
 }
 
@@ -141,7 +155,7 @@ void cleanup_thread(void* th_data){
  * @return
  */
 
-void* thread_process(void* th_data_){
+void* thread_process(void* th_data_) {
 
     thread_control_block_t *tcb_ = (thread_control_block_t*) th_data_;
     char buffer[INET6_ADDRSTRLEN];
@@ -162,7 +176,7 @@ void* thread_process(void* th_data_){
  * @return
  */
 
-int create_client_thread(const int server_socket_desc){
+int create_client_thread(const int server_socket_desc) {
 
     thread_control_block_t* tcb_ = malloc(sizeof(thread_control_block_t));
 
@@ -181,19 +195,19 @@ int create_client_thread(const int server_socket_desc){
     pthread_attr_t server_thread_attr;
 
     // create separate thread for processing
-    if (pthread_attr_init(&server_thread_attr)){
+    if (pthread_attr_init(&server_thread_attr)) {
         perror("Creating initial thread attributes failed");
         free(tcb_);
         return EXIT_FAILURE;
     }
 
-    if (pthread_attr_setdetachstate(&server_thread_attr, PTHREAD_CREATE_DETACHED)){
+    if (pthread_attr_setdetachstate(&server_thread_attr, PTHREAD_CREATE_DETACHED)) {
         perror("Setting thread attributes failed");
         free(tcb_);
         return EXIT_FAILURE;
     }
 
-    if (pthread_create(&server_thread, &server_thread_attr, &thread_process, (void*) tcb_)){
+    if (pthread_create(&server_thread, &server_thread_attr, &thread_process, (void*) tcb_)) {
         perror("Thread creation failed");
         free(tcb_);
         return EXIT_FAILURE;

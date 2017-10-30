@@ -17,17 +17,12 @@
 #include <pthread.h>
 
 
-#include "http_request_handling.h"
-
-#define PATH_LENGTH 512
+#include "http_response_handling.h"
 
 #ifndef HTTP_BASIC_SERVER_CONNECTION_HANDLING_H
 #define HTTP_BASIC_SERVER_CONNECTION_HANDLING_H
 #endif //HTTP_BASIC_SERVER_CONNECTION_HANDLING_H
 
-
-pthread_mutex_t resource_mutex;
-char pwd[PATH_LENGTH];
 
 typedef struct thread_control_block{
     int client_desc;

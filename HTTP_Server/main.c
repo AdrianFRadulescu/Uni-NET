@@ -9,11 +9,31 @@
 
 int main(const int argc, const char* argv[]) {
 
+    // adjust html resources
+
+    html_resource_t html_resource1_[] = {
+
+        {"html_pages/images/AEGYPTUS.jpg", 1},
+        {"html_pages/images/afghanistan-mountains.jpg",1},
+        {"html_pages/images/Greco-Bactrian_Kingdom_2nd_century_BC.jpg",1},
+        {"html_pages/images/llama_man.jpg", 1},
+        {"html_pages/erorr_page.html", 1},
+        {"html_pages/error_400_bad_request.html", 1},
+        {"html_pages/error_404_not_found.html", 1},
+        {"html_pages/Forbidden_Page.html", 0},
+        {"html_pages/index.html", 1},
+        {"html_pages/Manifesto.html", 1},
+        {"html_pages/The True Origin.html", 1}
+    };
+
+    html_resources_ = malloc(sizeof(html_resource_t) * HTML_RESOURCE_COUNT);
+
+    memcpy(html_resources_, html_resource1_, sizeof(html_resource1_));
+
     // adjust path of the application
     pwd_adjust(argv[0], pwd);
 
     // get port
-
     char* end_;
     uint16_t port;
 
@@ -34,6 +54,8 @@ int main(const int argc, const char* argv[]) {
     while (create_client_thread(server_socket_desc) >= 0);
 
     shutdown(server_socket_desc, 2);
+
+    free(html_resources_);
     //*/
     return 0;
 }

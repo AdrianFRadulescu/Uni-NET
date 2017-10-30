@@ -6,17 +6,24 @@
 #include <string.h>
 #include <stdio.h>
 #include <pthread.h>
+#include <unistd.h>
 
 
-#define CONTENT_LENGTH_HD "Content-Length: "
-#define CONTENT_TYPE_HD "Content-Type: text/html; charset=UTF-8"
-#define AGE_HD "Age: "
-#define ACCEPT_ENCODING_HD "Accept-Encoding: "
-/*
-#define
-#define
-#define
-*/
+// METHODS
+
+#define GET                     "GET"
+#define HEAD                    "HEAD"
+
+// HTTP VERSION
+#define SERVER_HTTP_VERSION            "HTTP/1.1"
+
+// REQUEST HEADERS
+
+#define CONTENT_LENGTH_REQ_HD   "Content-Length: "
+#define CONTENT_TYPE_REQ_HD     "Content-Type: text/html; charset=UTF-8"
+#define AGE_REQ_HD              "Age: "
+#define ACCEPT_ENCODING_REQ_HD  "Accept-Encoding: "
+#define ACCEPT_RANGES_REQ_HD    "Accept-Ranges: "
 
 #ifndef HTTP_BASIC_SERVER_HTTP_REQUEST_HANDLING_H
 #define HTTP_BASIC_SERVER_HTTP_REQUEST_HANDLING_H
@@ -27,25 +34,29 @@
  *  Represents a request line from an http request
  */
 
-typedef struct http_request_line{
+typedef struct http_request_line {
 
-    char* request_method;
-    char* request_URI;
-    char* request_http_version;
+    char* method_;
+    char* URI_;
+    char* http_version_;
 
 } http_request_line_t;
+
+typedef struct http_header{
+    char* type_;
+    char* content_;
+} http_header_t;
+
 
 /**
  *  Represents an http request
  */
 
-typedef struct http_request_block{
+typedef struct http_request_block {
 
     http_request_line_t request_line;
-    int request_header_count;
-    int request_header_available;
-    char** request_headers;
-    char* request_message;
+    int header_count;
+    http_header_t* headers_;
 
 } http_request_t;
 
@@ -71,8 +82,3 @@ void get_http_request(char*, http_request_t*, int*);
  * @return
  */
 
-char* load_file_content(char[], pthread_mutex_t*);
-
-char* load_response_line(char[], pthread_mutex_t*);
-
-void create_header(char[], char[], char[]);

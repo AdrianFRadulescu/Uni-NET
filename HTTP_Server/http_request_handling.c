@@ -14,22 +14,35 @@
 
 void init_request(http_request_t* request) {
 
-    request ->request_header_count = 0;
-    request ->request_header_available = 3;
-    request ->request_headers = malloc(request ->request_header_available * sizeof(char*));
+    request ->request_line.http_version_ = NULL;
+    request ->request_line.method_       = NULL;
+    request ->request_line.URI_          = NULL;
+    request ->header_count               = 0;
 
-    if (!request ->request_headers){
-        perror("request malloc");
-        exit(EXIT_FAILURE);
-    }
+    request ->headers_ = realloc(NULL, sizeof(http_header_t) * 0);
 }
 
-void tear_down_request(http_request_t* request){
+void tear_down_request(http_request_t* request_){
 
-    free(request ->request_headers);
-    free(request ->request_line.request_method);
-    free(request ->request_line.request_URI);
-    free(request ->request_line.request_http_version);
+    if (request_ ->request_line.method_)
+        free(request_ ->request_line.method_);
+    if (request_ ->request_line.URI_)
+        free(request_ ->request_line.URI_);
+    if (request_ ->request_line.http_version_)
+        free(request_ ->request_line.http_version_);
+
+    if (request_ ->headers_) {
+
+        for (int i = 0; i < request_ ->header_count; i ++){
+
+            if (request_ ->headers_[i].type_)
+                free(request_ ->headers_[i].type_);
+            if (request_ ->headers_[i].content_)
+                free(request_ ->headers_[i].content_);
+        }
+
+        free(request_->headers_);
+    }
 }
 
 /* Custom version of strtok
@@ -41,12 +54,12 @@ char* string_strtok_r(char* str_, char* sep_, char** save_) {
         str_ = *save_;
     }
 
+
     char* sep_pos_ = strstr(str_, sep_);
     fprintf(stderr, "here2\n");
     *save_ = sep_pos_ + strlen(sep_);
     if (sep_pos_)
-        memset(sep_pos_, 0, strlen(sep_));
-
+        *sep_pos_ = '\0';
     return str_;
 }
 
@@ -61,11 +74,11 @@ char* string_strtok_r(char* str_, char* sep_, char** save_) {
 
 char* str_replace(char** orig_, char* rep_, char* with_) {
 
-    char* result_ = realloc(NULL, 0); // the return string
-    char* rest_ = *orig_;
-    char* prev_rest_ = rest_;
+    char* result_       = realloc(NULL, 0); // the return string
+    char* rest_         = *orig_;
+    char* prev_rest_    = rest_;
+    int result_len      = 0;
     char* tmp_;
-    int result_len = 0;
 
     while ((rest_ = strstr(rest_, rep_))) {
         *rest_ = '\0';
@@ -98,14 +111,12 @@ char* str_replace(char** orig_, char* rep_, char* with_) {
 
 void get_http_request(char* buffer, http_request_t* request, int* ok) {
 
-    //char* token;
-    //char* sub_token;
-    char crlf_sep_[] = "\r\n";
-    char space_sep_[] = " ";
-    char* save_ = NULL;
-    char* sub_save = NULL;
+    char crlf_sep_[]    = "\r\n";
+    char space_sep_[]   = " ";
+    char col_sep_[]     = ": ";
+    char* save_         = NULL;
+    char* sub_save      = NULL;
     char line[2000];
-
     char* aux;
 
 
@@ -119,20 +130,47 @@ void get_http_request(char* buffer, http_request_t* request, int* ok) {
 
     // METHOD
     aux = string_strtok_r(line, space_sep_, &sub_save);
-    request ->request_line.request_method = malloc(sizeof(char) * strlen(aux));
-    strncpy(request ->request_line.request_method, aux, strlen(aux));
+    request ->request_line.method_ = malloc(sizeof(char) * strlen(aux));
+    strncpy(request ->request_line.method_, aux, strlen(aux));
 
     // URI
     aux = string_strtok_r(line, space_sep_, &sub_save);
-    request ->request_line.request_URI = malloc(sizeof(char) * strlen(aux));
-    strncpy(request ->request_line.request_URI, aux, strlen(aux));
+    request ->request_line.URI_ = malloc(sizeof(char) * strlen(aux));
+    strncpy(request ->request_line.URI_, aux, strlen(aux));
 
     //HTTP version
     aux = string_strtok_r(line, space_sep_, &sub_save);
-    request ->request_line.request_http_version = malloc(sizeof(char) * strlen(aux));
-    strncpy(request ->request_line.request_http_version, aux, strlen(aux));
+    request ->request_line.http_version_ = malloc(sizeof(char) * strlen(aux));
+    strncpy(request ->request_line.http_version_, aux, strlen(aux));
 
     // get the request headers
+
+    int header_count = 0;
+    while ((aux = string_strtok_r(NULL, crlf_sep_, &save_)) && *aux != '\0'){
+
+        sub_save = NULL;
+
+        while ((request ->headers_ = realloc(request ->headers_, sizeof(http_header_t) * (header_count + 1))) == NULL){
+            sleep(10);
+        }
+
+        aux = string_strtok_r(aux, col_sep_, &sub_save);
+        while (((request ->headers_)[header_count].type_ = malloc(sizeof(char) * strlen(aux) + 1)) == NULL) {
+            sleep(10);
+        }
+        strncpy(request ->headers_[header_count].type_, aux, strlen(aux) + 1);
+
+
+        aux = string_strtok_r(NULL, col_sep_, &sub_save);
+        while ((request ->headers_[header_count].content_ = malloc(sizeof(char) * strlen(aux) + 1)) == NULL) {
+            sleep(10);
+        }
+        strncpy(request ->headers_[header_count].content_, aux, strlen(aux) + 1);
+
+        header_count ++;
+    }
+
+    request ->header_count = header_count;
 
     // get message body
 }
@@ -144,36 +182,6 @@ void get_http_request(char* buffer, http_request_t* request, int* ok) {
  * @return
  */
 
-char* load_file_content(char file_path_[], pthread_mutex_t* mutex_) {
 
-    pthread_mutex_lock(mutex_);
-    FILE* file_desc_ = fopen(file_path_, "r");
-    fseek(file_desc_, 0, SEEK_END);
-    long file_size = ftell(file_desc_);
-    fseek(file_desc_, 0, SEEK_SET);
-
-    char *file_content_ = malloc(sizeof(char) * (size_t) file_size + 1);
-    fread(file_content_, (size_t) file_size, 1, file_desc_);
-    pthread_mutex_unlock(mutex_);
-    file_content_[file_size+1] = '\0';
-    fprintf(stderr, "load_file %p\n", (void*) file_content_);
-    return file_content_;
-}
-
-/**
- * Loads the http header contained in the given location
- * @param header_file_path
- * @return
- */
-
-void create_header(char header_[], char header_type_[], char header_value_[]) {
-    strncpy(header_, header_type_, strlen(header_type_));
-    strncpy(header_ + strlen(header_type_), header_value_, strlen(header_value_));
-    strncpy(header_ + strlen(header_type_) + strlen(header_value_), "\r\n", strlen("\r\n"));
-}
-
-char* load_response_line(char file_path_[], pthread_mutex_t* mutex_) {
-    return strcat(load_file_content(file_path_, mutex_), "\r\n");
-}
 
 
