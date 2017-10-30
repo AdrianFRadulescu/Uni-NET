@@ -5,9 +5,14 @@
 
 #include "listening_socket.h"
 #include "connection_handling.h"
-
+#include "compression_handling.h"
 
 int main(const int argc, const char* argv[]) {
+
+    // adjust path of the application
+    pwd_adjust(argv[0], pwd);
+
+    //deflate_file("html_pages/error_400_bad_request.html", "./tmp/aux1112.z");
 
     // adjust html resources
 
@@ -29,9 +34,6 @@ int main(const int argc, const char* argv[]) {
     html_resources_ = malloc(sizeof(html_resource_t) * HTML_RESOURCE_COUNT);
 
     memcpy(html_resources_, html_resource1_, sizeof(html_resource1_));
-
-    // adjust path of the application
-    pwd_adjust(argv[0], pwd);
 
     // get port
     char* end_;

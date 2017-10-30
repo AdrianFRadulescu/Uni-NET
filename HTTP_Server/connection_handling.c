@@ -82,22 +82,24 @@ static void handle_client_request(const int client_desc, const char* client_info
         // return error directly
         tear_down_request(&client_request);
 
-        char bad_request_response_[] = STATUS_CODE_400_BAD_REQUEST;
-        strcat(bad_request_response_, "\r\n");
-        strcat(bad_request_response_, CONTENT_LENGTH_RESP_HD);
-        strcat(bad_request_response_, "\r\n");
-        strcat(bad_request_response_, CONTENT_TYPE_RESP_HD);
-        strcat(bad_request_response_, "\r\n");
-        strcat(bad_request_response_, CONNECTION_RESP_HD);
-        strcat(bad_request_response_, "\r\n\r\n");
-
+        char* bad_request_response_ = malloc(sizeof(char) * strlen(STATUS_CODE_400_BAD_REQUEST));
+        strncpy(bad_request_response_, STATUS_CODE_400_BAD_REQUEST, strlen(STATUS_CODE_400_BAD_REQUEST));
+        bad_request_response_ = strcat(bad_request_response_, "\r\n");
+        bad_request_response_ = strcat(bad_request_response_, CONTENT_LENGTH_RESP_HD);
+        bad_request_response_ = strcat(bad_request_response_, "\r\n");
+        bad_request_response_ = strcat(bad_request_response_, CONTENT_TYPE_RESP_HD);
+        bad_request_response_ = strcat(bad_request_response_, "\r\n");
+        bad_request_response_ = strcat(bad_request_response_, CONNECTION_RESP_HD);
+        bad_request_response_ = strcat(bad_request_response_, "\r\n\r\n");
         // load 400 page
         char* message_body = load_file_content(strcat(pwd, "html_pages/error_400_bad_request.html"), &resource_mutex);
 
-        strcat(bad_request_response_, message_body);
+        bad_request_response_ = strcat(bad_request_response_, message_body);
         free(message_body);
 
         send(client_desc, bad_request_response_, strlen(bad_request_response_), 0);
+
+        free(bad_request_response_);
 
         return;
     }
