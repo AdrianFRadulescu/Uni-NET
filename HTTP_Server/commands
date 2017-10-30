@@ -1,0 +1,3 @@
+gzip --best < ./http_response_lines/200_OK > auxx1.gz
+
+gcc -D_POSIX_SOURCE -Wall -Werror -pedantic -std=c99 -D_GNU_SOURCE -pthread -lz main.c listening_socket.c connection_handling.c http_request_handling.c http_response_handling.c compression_handling.c -o server
