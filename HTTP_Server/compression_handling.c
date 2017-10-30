@@ -4,36 +4,68 @@
 
 #include "compression_handling.h"
 
+int deflate_file(char source_path_[], char dest_path_[]) {
 
-void z_error(int ret) {
-    perror("compression error: ");
-    switch (ret) {
-        case Z_ERRNO:
-            if (ferror(stdin))
-                perror("error reading stdin\n");
-            if (ferror(stdout))
-                perror("error writing stdout\n");
-            break;
-        case Z_STREAM_ERROR:
-            perror("invalid compression level\n");
-            break;
-        case Z_DATA_ERROR:
-            perror("invalid or incomplete deflate data\n");
-            break;
-        case Z_MEM_ERROR:
-            perror("out of memory\n");
-            break;
-        default:
-            perror("zlib version mismatch!\n");
+
+    char source_arg_[70] = "";
+    strncpy(source_arg_, " < ", strlen(" < "));
+    strncpy(source_arg_ + strlen(source_arg_), source_path_, strlen(source_path_));
+
+    char dest_arg_[70] = "";
+    strncpy(dest_arg_, " > ", strlen(" > "));
+    strncpy(dest_arg_ + strlen(dest_arg_), dest_path_, strlen(dest_path_));
+
+    char executable_[200] = "./zlib_aux_exec";
+
+    strncpy(executable_ + strlen(executable_), source_arg_, strlen(source_arg_));
+    strncpy(executable_ + strlen(executable_), dest_arg_, strlen(dest_arg_));
+
+    fprintf(stderr, "%s\n", executable_);
+    if (system(executable_) == 0){
+        fprintf(stderr, "compression success");
+        return 0;
     }
+    else
+        return -1;
 }
 
+int gzip_file(char source_path_[], char dest_path_[]) {
 
-void deflate_file(char source_path_[], char dest_path_[],  int def_level){
+    char source_arg_[70] = "";
+    strncpy(source_arg_, " < ", strlen(" < "));
+    strncpy(source_arg_ + strlen(source_arg_), source_path_, strlen(source_path_));
 
-    FILE* source_ = fopen(source_path_, "rb");
-    FILE* dest_   = fopen(dest_path_, "wb");
+    char dest_arg_[70] = "";
+    strncpy(dest_arg_, " > ", strlen(" > "));
+    strncpy(dest_arg_ + strlen(dest_arg_), dest_path_, strlen(dest_path_));
 
+    char executable_[200] = "gzip --best";
 
+    strncpy(executable_ + strlen(executable_), source_arg_, strlen(source_arg_));
+    strncpy(executable_ + strlen(executable_), dest_arg_, strlen(dest_arg_));
+
+    fprintf(stderr, "%s\n", executable_);
+    if (system(executable_) == 0){
+        fprintf(stderr, "compression success");
+        return 0;
+    }
+    else
+        return -1;
 }
 
+int remove_file(char file_path_[]){
+
+    char source_arg_[70] = "";
+    strncpy(source_arg_, " ", strlen(" < "));
+    strncpy(source_arg_ + strlen(source_arg_), file_path_, strlen(file_path_));
+
+    char executable_[200] = "rm";
+    strncpy(executable_ + strlen(executable_), source_arg_, strlen(source_arg_));
+
+    if (system(executable_) == 0){
+        fprintf(stderr, "file removed");
+        return 0;
+    }
+    else
+        return -1;
+}

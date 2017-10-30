@@ -6,14 +6,8 @@
 #include <stdlib.h>
 #include <zlib.h>
 #include <assert.h>
-
-#if defined(MSDOS) || defined(OS2) || defined(WIN32) || defined(__CYGWIN__)
-#  include <fcntl.h>
-#  include <io.h>
-#  define SET_BINARY_MODE(file) setmode(fileno(file), O_BINARY)
-#else
-#  define SET_BINARY_MODE(file)
-#endif
+#include <string.h>
+#include <unistd.h>
 
 #define CHUNK 16384
 
@@ -22,7 +16,8 @@
 
 #endif //HTTP_SERVER_COMPRESSION_HANDLING_H
 
-void z_error(int);
+int deflate_file(char[], char[]);
 
-void deflate_file(char[], char[], int);
+int gzip_file(char[], char[]);
 
+int remove_file(char[]);
