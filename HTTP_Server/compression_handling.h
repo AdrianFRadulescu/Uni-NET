@@ -21,3 +21,4 @@ int deflate_file(char[], char[]);
 int gzip_file(char[], char[]);
 
 int remove_file(char[]);
+

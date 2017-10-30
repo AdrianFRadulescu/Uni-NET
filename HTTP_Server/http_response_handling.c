@@ -85,6 +85,9 @@ static void add_header(http_response_t* response_, char header_type_[], char hea
 
 }
 
+static void check_URI(char* URI_){
+    fprintf(stderr, "%s\n", URI_);
+}
 
 void create_response(http_request_t request, http_response_t* response_){
 
@@ -109,7 +112,7 @@ void create_response(http_request_t request, http_response_t* response_){
         response_ ->status_code_ = malloc(sizeof(char) * strlen(STATUS_CODE_400_BAD_REQUEST));
         strncpy(response_ ->status_code_, STATUS_CODE_400_BAD_REQUEST, strlen(STATUS_CODE_400_BAD_REQUEST));
 
-        add_header(response_, CONNECTION_RESP_HD, CONNECTION_RESP_HD_VALUE);
+        add_header(response_, CONNECTION_RESP_HD, CONNECTION_VALUE);
 
         response_ ->page_ = load_file_content(strcat(pwd, "html_pages/error_400_bad_request.html"), &resource_mutex);
         return;
@@ -123,10 +126,12 @@ void create_response(http_request_t request, http_response_t* response_){
         response_ ->status_code_ = malloc(sizeof(char) * strlen(STATUS_CODE_200_OK));
         strncpy(response_ ->status_code_, STATUS_CODE_200_OK, strlen(STATUS_CODE_200_OK));
         response_ ->page_ = load_file_content(strcat(pwd, "html_pages/index.html"), &resource_mutex);
-
-
     }
 
+    else{
+        //check if URI is valid
+        check_URI(request.request_line.URI_);
+    }
 
 }
 

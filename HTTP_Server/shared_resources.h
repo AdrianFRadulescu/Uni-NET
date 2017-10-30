@@ -2,7 +2,7 @@
 // Created by Radulescu Adrian on 30/10/2017.
 //
 
-#include <pthread/pthread.h>
+#include <pthread.h>
 
 #define PATH_LENGTH                 512
 #define MAX_RESOURCE_PATH_LENGTH    70

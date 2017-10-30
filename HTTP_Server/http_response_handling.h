@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <pthread/pthread.h>
 #include <time.h>
 
 #include "shared_resources.h"
@@ -13,29 +12,32 @@
 
 // STATUS CODES
 
-#define STATUS_CODE_200_OK                  "HTTP/1.1 200 OK"
-#define STATUS_CODE_206_PARTIAL_CONTENT     "HTTP/1.1 206 Partial Content"
-#define STATUS_CODE_302_FOUND               "HTTP/1.1 302 Found"
-#define STATUS_CODE_400_BAD_REQUEST         "HTTP/1.1 400 Bad Request"
-#define STATUS_CODE_403_BAD_REQUEST         "HTTP/1.1 403 Forbidden"
-#define STATUS_CODE_404_NOT_FOUND           "HTTP/1.0 404 Not Found"
+#define STATUS_CODE_200_OK                                  "HTTP/1.1 200 OK"
+#define STATUS_CODE_206_PARTIAL_CONTENT                     "HTTP/1.1 206 Partial Content"
+#define STATUS_CODE_302_FOUND                               "HTTP/1.1 302 Found"
+#define STATUS_CODE_400_BAD_REQUEST                         "HTTP/1.1 400 Bad Request"
+#define STATUS_CODE_403_BAD_REQUEST                         "HTTP/1.1 403 Forbidden"
+#define STATUS_CODE_404_NOT_FOUND                           "HTTP/1.1 404 Not Found"
+#define STATUT_CODE_416_REQUESTED_RANGE_NOT_SATISFIABLE     "HTTP/1.1 416 Range Not Satisfiable"
 
 // RESPONSE HEADERS
 
-#define ACCEPT_RANGES_RESP_HD               "Accept-Ranges: "
-#define CONTENT_LENGTH_RESP_HD              "Content-Length: "
-#define CONTENT_TYPE_RESP_HD                "Content-Type: "
-#define CONTENT_ENCODING_RESP_HD            "Content-Encoding: "
-#define CONTENT_LANGUAGE_RESP_HD            "Content-Language: en-US"
-#define CONNECTION_RESP_HD                  "Connection: "
-#define TRANSFER_ENCODING_RESP_HD           "Transfer-Encoding: "
+#define ACCEPT_RANGES_RESP_HD                               "Accept-Ranges: "
+#define CONTENT_LENGTH_RESP_HD                              "Content-Length: "
+#define CONTENT_TYPE_RESP_HD                                "Content-Type: "
+#define CONTENT_ENCODING_RESP_HD                            "Content-Encoding: "
+#define CONTENT_LANGUAGE_RESP_HD                            "Content-Language: en-US"
+#define CONTENT_RANGE_RESP_HD                               "Content-Range: bytes "
+#define CONNECTION_RESP_HD                                  "Connection: "
+#define TRANSFER_ENCODING_RESP_HD                           "Transfer-Encoding: "
 
 // RESPONSE HEADERS VALUES
 
-#define ACCEPT_RANGES_RESP_HD_VALUE_BYTES   "bytes"
-#define ACCEPT_RANGES_RESP_HD_VALUE_NONE    "none"
-#define CONTENT_TYPE_RESP_HD_VALUE          "text/html; charset=UTF-8"
-#define CONNECTION_RESP_HD_VALUE            "close"
+#define ACCEPT_RANGES_VALUE_BYTES                           "bytes"
+#define ACCEPT_RANGES_VALUE_NONE                            "none"
+#define CONTENT_TYPE_VALUE_HTML                             "text/html; charset=UTF-8"
+#define CONTENT_TYPE_VALUE_MULTIRANGES                      "multipart/byteranges; boundary=3d6b6a416f9b5"
+#define CONNECTION_VALUE                                    "close"
 
 
 #ifndef HTTP_SERVER_HTTP_RESPONSE_HANDLING_H

@@ -56,7 +56,6 @@ char* string_strtok_r(char* str_, char* sep_, char** save_) {
 
 
     char* sep_pos_ = strstr(str_, sep_);
-    fprintf(stderr, "here2\n");
     *save_ = sep_pos_ + strlen(sep_);
     if (sep_pos_)
         *sep_pos_ = '\0';
